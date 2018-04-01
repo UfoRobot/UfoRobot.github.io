@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Hello World!
+mathjax: true
 ---
 
 I may or may not start this blog.
