@@ -135,10 +135,13 @@ Cov[X_{t}, X_{t + \tau}] = Cov[X_{t+h}, X_{t +h + \tau}]  \quad \forall t \ \for
 
 <p>From \ref{eqn:wss_1} and \ref{eqn:wss_2} it follows that the covariance function only depends on the lag \(\tau\) and can be expressed in terms of the autocorrelation function \(R(\tau)\):</p>
 
-<p>\[\begin{equation}\label{eqn:autocorr}
+<p>\[
+\begin{equation}\label{eqn:autocorr}
 Cov[X_{t}, X_{t + \tau}] = E[(X_t - \mu)(X_{t + \tau} - \mu)] = E[X_tX_{t+\tau}] = R(\tau)
-\end{equation}\]
-where \(R(\tau) = R(-\tau)\) is symmetric.</p>
+\end{equation}
+\]</p>
+
+<p>where \(R(\tau) = R(-\tau)\) is symmetric.</p>
 
 <p>Assume that we wanted to approximate each value \(X_t\) as a linear combination of its previous \(p\) values:</p>
 

@@ -4,7 +4,7 @@
  <title>UfoRoblog</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2018-05-24T23:00:08+01:00</updated>
+ <updated>2018-05-24T23:10:54+01:00</updated>
  <id>http://localhost:4000</id>
  <author>
    <name>Ascanio Vimercati Sanseverino</name>
@@ -42,10 +42,13 @@ Cov[X_{t}, X_{t + \tau}] = Cov[X_{t+h}, X_{t +h + \tau}]  \quad \forall t \ \for
 
 &lt;p&gt;From \ref{eqn:wss_1} and \ref{eqn:wss_2} it follows that the covariance function only depends on the lag \(\tau\) and can be expressed in terms of the autocorrelation function \(R(\tau)\):&lt;/p&gt;
 
-&lt;p&gt;\[\begin{equation}\label{eqn:autocorr}
+&lt;p&gt;\[
+\begin{equation}\label{eqn:autocorr}
 Cov[X_{t}, X_{t + \tau}] = E[(X_t - \mu)(X_{t + \tau} - \mu)] = E[X_tX_{t+\tau}] = R(\tau)
-\end{equation}\]
-where \(R(\tau) = R(-\tau)\) is symmetric.&lt;/p&gt;
+\end{equation}
+\]&lt;/p&gt;
+
+&lt;p&gt;where \(R(\tau) = R(-\tau)\) is symmetric.&lt;/p&gt;
 
 &lt;p&gt;Assume that we wanted to approximate each value \(X_t\) as a linear combination of its previous \(p\) values:&lt;/p&gt;
 
