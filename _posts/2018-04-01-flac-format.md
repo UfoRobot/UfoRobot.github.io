@@ -60,8 +60,9 @@ E[\epsilon_t X_{t-i}] = 0 \quad \forall 1 \leq i \leq p
 \\]
 
 We can use the orthogonality principle to derive the Yule-Walker equations:
+
 \\[
-\begin{equation}\label{eqn:yw}
+\begin{equation}
 \begin{split}
 \mathbf{0} = & E[\epsilon_t \mathbf{X_{t-1:t-p}}] \\\
            = & E[(X_t - \mathbf{X_{t-1:t-p}}^\top\alpha)\mathbf{X_{t-1:t-p}}] \\\
@@ -71,7 +72,7 @@ We can use the orthogonality principle to derive the Yule-Walker equations:
             = & E[X_t \mathbf{X_{t-1:t-p}} - \mathbf{X_{t-1:t-p}}\mathbf{X_{t-1:t-p}}^\top\boldsymbol{\alpha}] \\\
             = & E[X_t \mathbf{X_{t-1:t-p}}] - E[ \mathbf{X_{t-1:t-p}}\mathbf{X_{t-1:t-p}}^\top]\boldsymbol{\alpha} \\\
 \end{split}
-\end{equation}
+\end{equation}\label{eqn:yw1}
 \\]
 
 Using \ref{eqn:autocorr} we can rewrite \\( E[ \mathbf{X_{t-1:t-p}}\mathbf{X_{t-1:t-p}}]^\top = \mathbf{R}\\)  as:
@@ -87,7 +88,7 @@ R(p-1) & R(p-2) & R(p-3) & \cdots & R(0) \\\
 \end{bmatrix}
 \\]
 
-and by letting \\(\mathbf{r} = \begin{bmatrix} R(1) & \cdots & R(p) \end{bmatrix}^\top\\) we can rewrite \ref{eqn:yw} as:
+and by letting \\(\mathbf{r} = \begin{bmatrix} R(1) & \cdots & R(p) \end{bmatrix}^\top\\) we can rewrite \ref{eqn:yw1} as:
 
 \begin{equation}\label{eqn:yh2}
 \mathbf{R}\boldsymbol{\alpha} = \mathbf{r}   
@@ -161,10 +162,10 @@ A good general code that works for any input distribution is the Huffman code [1
 
 For the case of alphabets following a geometric distribution the optimal prefix code (a prefix code is a code where no code-word is allowed to be the prefix of another code-word) is the Golomb code [3], making it highly suitable for situations in which the occurrence of small values in the input stream is significantly more likely than large values, as for the case of the reconstruction errors.
 
-Golomb coding [2] was invented by Solomon W. Golomb in the 1960s. It takes the input \\(s\\) and divides it by the tunable parameter \\(m\\). First the quotient is encoded in *unary coding* and then the remainder is econded in \textit{truncated binary coding}. Rice coding is a special case of Golomb coding where \(m = 2^k\), which is faster to encode and decode thanks to the usage of powers of 2. It is very intuitive to understand how the coding scheme works just by looking at the example in the following table
+Golomb coding [2] was invented by Solomon W. Golomb in the 1960s. It takes the input \\(s\\) and divides it by the tunable parameter \\(m\\). First the quotient is encoded in *unary coding* and then the remainder is econded in *truncated binary coding*. Rice coding is a special case of Golomb coding where \(m = 2^k\), which is faster to encode and decode thanks to the usage of powers of 2. It is very intuitive to understand how the coding scheme works just by looking at the example in the following table
 
 
-#Entropy coding and Rice codes
+# Entropy coding and Rice codes
 Suppose one was to observe a realisation of the above mentioned stochastic process and used LPC (or some other model) to approximate it. In order to reconstruct the original signal without approximation error it is necessary to know what the exact realisation of the reconstruction error were and add them to the reconstruction. The problem of efficiently storing these residuals is an instance of *entropy encoding*.
 
 
