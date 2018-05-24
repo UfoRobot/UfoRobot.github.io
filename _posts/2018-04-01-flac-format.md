@@ -1,6 +1,7 @@
 ---
 layout: post
-title: The .flac format: linear predictive coding and rice codes
+title: The .flac format &#58; linear predictive coding and rice codes
+mathjax: True
 ---
 
 # Introduction
