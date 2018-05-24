@@ -209,7 +209,7 @@ Golomb coding \cite{golomb1966run} was invented by Solomon W. Golomb in the 1960
 # The FLAC codec
 At this point it should be intuitive how modelling and entropy coding can be combined to form a lossless audio codec. FLAC is mainly based on *shorten* [4], with additional features for more convenient use in real case consumer scenarios. 
 
-![The FLAC stream]({{ "assets/flac_stream.png" | absolute_url }})
+![The FLAC stream](https://github.com/UfoRobot/UfoRobot.github.io/blob/master/assets/flac_stream.png)
 
 
 The basic structure of a FLAC stream is:
