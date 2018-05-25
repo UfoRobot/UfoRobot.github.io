@@ -1,6 +1,6 @@
 ---
 layout: post
-title: The .flac format &#58; linear predictive coding and rice codes
+title: The .flac format&#58; linear predictive coding and rice codes
 mathjax: true
 ---
 
@@ -13,7 +13,7 @@ Most lossless audio compression codecs work very similarly: first the audio stre
 # Linear predictive coding
 Linear predictive coding is a modelling technique equivalent to an \\(AR(p)\\) auto regressive model: the signal \\(X_t\\) at time \\\(t\\\) is modelled as a linear combination of its previous \\(p\\) values.
 
-More formally, let \\(\{X_t\}\\) be a wide sense stationary (WSS) stochastic process with zero mean and with the \\(AR(p)\\) property, which is:
+More formally, let \\(\{X_t\}\\) be a wide sense stationary (WSS) stochastic process with zero mean, which is:
 
 \\[
 \begin{equation}\label{eqn:wss_1}
@@ -142,7 +142,7 @@ It is easy to notice the similarities with equation \ref{eqn:yh2} : this solutio
 
 
 
-*Entropy coding and Rice codes*
+# Entropy coding and Rice codes
 Suppose one was to observe a realisation of the above mentioned stochastic process and used LPC (or some other model) to approximate it. In order to reconstruct the original signal without approximation error it is necessary to know what the exact realisation of the reconstruction error were and add them to the reconstruction. The problem of efficiently storing these residuals is an instance of *entropy encoding*.
 
 
@@ -152,7 +152,11 @@ where \\(P(x \in X) = P(x)\\)
 
 
 now, given an alphate of symbols \\(\Sigma\\), in the digital case \\(\Sigma = \{0, 1\}\\), a code is defined as
-\\[C : \boldsymbol{\chi} \rightarrow \Sigma^*\\]
+
+\\[
+C : \boldsymbol{\chi} \rightarrow \Sigma^*
+\\]
+
 \\(C(x)\\) is the code associated with \\(x\\). Let its length be \\(l(C(x))\\), then the expected length of a code is:
 \\[l(C) = E_{x \sim P(x)}[l(C(x))] = \sum_{x \in \chi} P(x)l(C(x))\\]
 
@@ -207,7 +211,7 @@ Golomb coding [2] was invented by Solomon W. Golomb in the 1960s. It takes the i
 
 
 # The FLAC codec
-At this point it should be intuitive how modelling and entropy coding can be combined to form a lossless audio codec. FLAC is mainly based on *shorten* [4], with additional features for more convenient use in real case consumer scenarios. 
+At this point it should be intuitive how modelling and entropy coding can be combined to form a lossless audio codec. FLAC is mainly based on *shorten* [4], with additional features for more convenient use in real case consumer scenarios. A high level overview of the codec can be found [here](https://xiph.org/flac/documentation_format_overview.html), while the definition of the stream is defined more precisly [here](https://xiph.org/flac/format.html)
 
 ![The FLAC stream](/assets/flac_stream.png)
 
@@ -231,7 +235,7 @@ The raw encoding of an audio signal is extremely space inefficient: your common 
 
 At a high level, the compression procedure reduces the redundancy in the raw representation by identifying and modelling structured patterns in the raw signal: it exploits this patterns to approximate the raw signal using a mathematical function, and then also stores the approximation error so that it can revert it and recreate the original signal with no loss of information. Compression is achieved because storing both parts is much more efficient than storing the original raw signal: the approximated signal is saved by simply storing its mathematical model while the approximation error is saved more efficiently because of the use of Rice coding. Errors are almost always small and storing small numbers takes less space. In addition to this, their distribution can be assumed a priori, which allows to use a coding scheme optimised for it.
 
-More specifically, the model being fitted to the signal by FLAC can either be a constant value (for silent moments), LPC or a fixed polynomial predictor from a subset of 4 that usually work well. Fixed polynomial prediction is much faster, but less accurate than LPC. The higher the maximum LPC order \\(p\\), the slower but more accurate the model will be. However, there are diminishing returns with increasing orders: \\(p = 1\\) already leads to good compression, while higher orders increase the required computation time with smaller compression benefits and in addition to this the LPC parameters take more space to save. The approximation error is then obtained by subtracting the original signal with approximated signal, and since they are (empirically) Laplace distributed they can efficiently be encoded using a simple symmetric variation of the Rice coding scheme.
+More specifically, the model being fitted to the signal by FLAC can either be a constant value (for silent moments), LPC or a fixed polynomial predictor from a subset of 4 that usually work well. Fixed polynomial prediction is much faster, but less accurate than LPC. The higher the maximum LPC order \\(p\\), the slower but more accurate the model will be. However, there are diminishing returns with increasing orders: \\(p = 1\\) already leads to good compression, while higher orders increase the required computation time with smaller compression benefits and in addition to this the LPC parameters take more space to save. The approximation error is then obtained by subtracting the original signal with approximated signal. Empirically they are Laplace distributed, and can be assumed to be uncorrelated, so they can efficiently be encoded independently using Rice coding scheme (taking into account the presence of the sign bit).  
 These procedure is applied to both channel, left and right independently. A neat trick that can be used to often increase the compression of the block is to switch from left-right to mid-side (mid = (left + right) / 2, side = left - right). 
 
 According to the modelling choice, the block is then encoded. First a sub frame is built, marking the model used in the header and encoding the audio content in the sub frame body. For example, in the case of LPC the sub frame body contains the \\(p\\) initial samples, the LPC coefficient and then the sequence of the encoded residuals. Finally the frame is constructed by preceding the sub frame with a frame header ant trailing it with a frame footer. The header starts with a sync code, and contains the minimum information necessary for a decoder to play the stream, like sample rate, bits per sample, etc. It also contains the block or sample number and an 8-bit CRC of the frame header. The frame footer contains a 16-bit CRC of the entire encoded frame for error detection. If the reference decoder detects a CRC error it will generate a silent block.
