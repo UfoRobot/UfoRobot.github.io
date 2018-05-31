@@ -7,7 +7,7 @@ mathjax: true
 # Introduction
 **FLAC** stands for **F**ree **L**ossless **A**udio **C**odec. It's the standard open source codec used nowadays for lossless audio compression. In this post I would like to take the .flac format as an example and focus on two core step of the process of lossless audio compression: linear predictive coding and entropy coding with Rice codes.
 
-### TL;TR
+### TL;DR
 Most lossless audio compression codecs work very similarly: first the audio stream is split into blocks, and then each one is compressed. Compression is achieved identifying and modelling structure in the signal: any explicit structure and repeating pattern is redundant by definition and can be instead represented more efficiently using a mathematical model and its parameters to approximate it. Usually a very simple model is used, from constant values to model silence to the more flexible linear predictive coding (a linear autoregressive model). In order to recreate the signal exactly, the approximation residuals are also saved but using a coding scheme optimised for their distribution. Linear predictive coding leads to residual Laplace-distributed and hence usually the Rice coding scheme is used. 
 
 # Linear predictive coding
