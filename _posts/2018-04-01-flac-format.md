@@ -151,7 +151,7 @@ Assume the observed data can be modelled as a discrete random variable (note tha
 where \\(P(x \in X) = P(x)\\)
 
 
-now, given an alphate of symbols \\(\Sigma\\), in the digital case \\(\Sigma = \{0, 1\}\\), a code is defined as
+now, given an alphate of symbols \\(\Sigma\\), in the digital case \\(\Sigma = \\{0, 1\\}\\), a code is defined as
 
 \\[
 C : \boldsymbol{\chi} \rightarrow \Sigma^*
@@ -166,31 +166,7 @@ A good general code that works for any input distribution is the Huffman code [1
 
 For the case of alphabets following a geometric distribution the optimal prefix code (a prefix code is a code where no code-word is allowed to be the prefix of another code-word) is the Golomb code [3], making it highly suitable for situations in which the occurrence of small values in the input stream is significantly more likely than large values, as for the case of the reconstruction errors.
 
-Golomb coding [2] was invented by Solomon W. Golomb in the 1960s. It takes the input \\(s\\) and divides it by the tunable parameter \\(m\\). First the quotient is encoded in *unary coding* and then the remainder is econded in *truncated binary coding*. Rice coding is a special case of Golomb coding where \(m = 2^k\), which is faster to encode and decode thanks to the usage of powers of 2. It is very intuitive to understand how the coding scheme works just by looking at the example in the following table
-
-
-# Entropy coding and Rice codes
-Suppose one was to observe a realisation of the above mentioned stochastic process and used LPC (or some other model) to approximate it. In order to reconstruct the original signal without approximation error it is necessary to know what the exact realisation of the reconstruction error were and add them to the reconstruction. The problem of efficiently storing these residuals is an instance of *entropy encoding*.
-
-
-Assume the observed data can be modelled as a discrete random variable (note that we redefine \\(X\\) from the previous section):
-\\[ X : \Omega \rightarrow \boldsymbol{\chi} \\]
-where \\(P(x \in X) = P(x)\\)
-
-
-now, given an alphate of symbols \\(\Sigma\\), in the digital case \\(\Sigma = \{0, 1\}\\), a code is defined as
-\[\C : \boldsymbol{\chi} \rightarrow \Sigma^*\\]
-\\(C(x)\\) is the code associated with \\(x\\). Let its length be \\(l(C(x))\\), then the expected length of a code is:
-\\[l(C) = E_{x \sim P(x)}[l(C(x))] = \sum_{x \in \chi} P(x)l(C(x))\\]
-
-when designing or choosing a code the objective is to minimise \\(l(C)\\) for the distribution of input words \\(p(x)\\), so that the encoded input will require on average the least number of symbols. This is the problem referred to as *entropy coding*
-
-A good general code that works for any input distribution is the Huffman code [1], and is for example used in the popular compression tool *gzip*. When the distribution of the input is known a priori though it is possible to use a coding scheme tailored for that distribution.
-
-For the case of alphabets following a geometric distribution the optimal prefix code (a prefix code is a code where no code-word is allowed to be the prefix of another code-word) is the Golomb code [3], making it highly suitable for situations in which the occurrence of small values in the input stream is significantly more likely than large values, as for the case of the reconstruction errors.
-
-Golomb coding [2] was invented by Solomon W. Golomb in the 1960s. It takes the input \\(s\\) and divides it by the tunable parameter \\(m\\). First the quotient is encoded in *unary coding* and then the remainder is econded in *truncated binary coding*. Rice coding is a special case of Golomb coding where \\(m = 2^k\\), which is faster to encode and decode thanks to the usage of powers of 2. It is very intuitive to understand how the coding scheme works just by looking at the follwowing table example
-
+Golomb coding [2] was invented by Solomon W. Golomb in the 1960s. It takes the input \\(s\\) and divides it by the tunable parameter \\(m\\). First the quotient is encoded in *unary coding* and then the remainder is econded in *truncated binary coding*. Rice coding is a special case of Golomb coding where \\(m = 2^k\\), which is faster to encode and decode thanks to the usage of powers of 2. It is very intuitive to understand how the coding scheme works just by looking at the example in the following table
 
 <br>
 
