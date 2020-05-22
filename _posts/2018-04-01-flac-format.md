@@ -5,9 +5,9 @@ mathjax: true
 ---
 
 # Introduction
-**FLAC** stands for **F**ree **L**ossless **A**udio **C**odec and it's the standard open source codec used for lossless audio compression. In  this post I would like to use the .flac example to explore how loselees audio compression is possible and focuse on the two core aspects of it: linear predictive coding and entropy coding with Rice codes.
+**FLAC** stands for **F**ree **L**ossless **A**udio **C**odec and it's the standard open source codec used for lossless audio compression. In  this post I would like to use the .flac example to explore how lossless audio compression is possible and focus on the two core aspects of it: linear predictive coding and entropy coding with Rice codes.
 
-### TL;TR
+### TL;DR
 Most lossless audio compression codecs work very similarly: they split the audio stream in multiple blocks or frames and then compress each one of them. Compression is achieved identifying and modelling the structure in the audio signal: any repeating pattern is redundant by definition and can instead be represented more efficiently using a mathematical model and its parameters. These models need not to be complicated: constant values can already model silence blocks while linear predictive coding (a linear autoregressive model) is used for the other blocks. In order to recreate the signal without loss the approximation residuals  of the models are also saved, but using a coding scheme optimised for their distribution. Linear predictive coding leads to residual Laplace-distributed and hence usually the Rice coding scheme is used. 
 
 # Linear predictive coding
@@ -50,7 +50,7 @@ let \\(\boldsymbol{\boldsymbol{\alpha}} =  \begin{bmatrix} \alpha_1 & \cdots & \
             =  X_t - \mathbf{\boldsymbol{\alpha}}^\top \mathbf{X_{t-1:t-p}}
 \\]
 
-For an optimal approximation we then chose \\(\boldsymbol{\alpha}\\) so that it minimises the expected squared estimation error. In order to do so we make use of the following lemma:
+For an optimal approximation we then chose \\(\boldsymbol{\alpha}\\) so that it minimises the expected squared estimation error. To derive the solution we make use of the orthogonality principle.
 
 
 >**Lemma: Orthogonality principle.**  
@@ -59,7 +59,7 @@ For an optimal approximation we then chose \\(\boldsymbol{\alpha}\\) so that it 
 E[\epsilon_t X_{t-i}] = 0 \quad \forall 1 \leq i \leq p
 \\]
 
-We can use the orthogonality principle to derive the Yule-Walker equations:
+From the orthogonality principle we can derive the Yule-Walker equations:
 
 \\[
 \begin{equation}
@@ -95,9 +95,9 @@ and by defining \\(\mathbf{r} = \begin{bmatrix} R(1) & \cdots & R(p) \end{bmatri
 \end{equation}
 
 
-And with this form we can solve for \\(\boldsymbol{\alpha}\\) given estimates of \\(\mathbf{R}\\) and \\(\mathbf{r}\\)
+In this form we can solve for \\(\boldsymbol{\alpha}\\) given estimates of \\(\mathbf{R}\\) and \\(\mathbf{r}\\)
 
-A comment about the complexity of solving the equation: note that the matrix \\(\mathbf{R}\\) is a *toeplitz* matrix. A toeplitz matrix has the property that each descending diagonal from left to right is constant and for these matrices there is an algorithm, the Levinson–Durbin recursion, that can solve the system in \\(O(p^2)\\) which is much better than simply inverting \\(\mathbf{R}\\), which would have a cost \\(O(p^3)\\). The overall computational cost is thus \\(O(np + p^2)\\) where the first term comes from the cost of computing the sample estimate of the auto correlation matrix.
+The matrix \\(\mathbf{R}\\) is a *toeplitz* matrix. A toeplitz matrix has the property that each descending diagonal from left to right is constant and for these matrices there is an algorithm, the Levinson–Durbin recursion, that can solve the system in \\(O(p^2)\\) which is much better than simply inverting \\(\mathbf{R}\\), which would have a cost \\(O(p^3)\\). The overall computational cost is thus \\(O(np + p^2)\\) where the first term comes from the cost of computing the sample estimate of the auto correlation matrix.
 
 
 ## Comparison with ordinary least squares
@@ -141,57 +141,32 @@ y_N  & y_{N-1} & \cdots & y_{N-p} \\\\
 It is easy to notice the similarities with equation \ref{eqn:yh2} : this solution is computing the sample estimates of \\(\mathbf{R}\\) and \\( \mathbf{r}\\), but using a different subset of samples for each estimate. Because of this the estimates have to be recomputed for each entry, and the toeplitz structure is lost, rsulting in higher estimation costs to build the matrices and higher matrix inversion costs to solve for \\(\boldsymbol{\alpha}\\). The computational complexity of this solution is \\(O(n^2p + p^3)\\), where the first term comes from the inner product of the matrix of covariates and the second term from its inversion. Usually \\(n \gg p\\) and thus this solution has complexity \\(O(n^2p)\\) which is much worst than the previous result of \\(O(np)\\) when using \ref{eqn:yh2}!
 
 
-
 # Entropy coding and Rice codes
-Suppose one was to observe a realisation of the above mentioned stochastic process and used LPC (or some other model) to approximate it, for example when attempting to model the audio signal of in a block. The approximation will always have some residual error and therefore in order to reconstruct the original signal without loss one has to know what the exact realisation of these reconstruction error were and add them back to the reconstruction. The problem of efficiently storing these residuals is an instance of *entropy encoding*.
+Suppose one was to observe a realisation of the above mentioned stochastic process, for example an audio signal, and used LPC or some other model to approximate it. In order to reconstruct the original signal without any approximation error it is necessary to know what the exact realisation of the these error were and add them back into the reconstruction. The problem of efficiently storing these residuals is an instance of *entropy coding*.
 
 
-Assume the observed data can be modelled as a discrete random variable (note that we redefine \(X\) from the previous section):
+Let's start by defining what a code is. Assume the observed data can be modelled as a discrete random variable (note that we redefine \(X\) from the previous section):
 \\[ X : \Omega \rightarrow \boldsymbol{\chi} \\]
 where \\(P(x \in X) = P(x)\\)
 
 
-now, given an alphate of symbols \\(\Sigma\\), in the digital case \\(\Sigma = \{0, 1\}\\), a code is defined as
+now, given an alphabet of symbols \\(\Sigma\\), in the digital case \\(\Sigma = \\{0, 1\\}\\), a code is defined as
 
 \\[
 C : \boldsymbol{\chi} \rightarrow \Sigma^*
 \\]
 
-\\(C(x)\\) is the code associated with \\(x\\). Let its length be \\(l(C(x))\\), then the expected length of a code is:
+\\(C(x)\\) is the code associated with \\(x\\),  \\(l(C(x))\\) its length and therefore the expected length of a code is:
 \\[l(C) = E_{x \sim P(x)}[l(C(x))] = \sum_{x \in \chi} P(x)l(C(x))\\]
 
 when designing or choosing a code the objective is to minimise \\(l(C)\\) for the distribution of input words \\(p(x)\\), so that the encoded input will require on average the least number of symbols. This is the problem referred to as *entropy coding*
 
 A good general code that works for any input distribution is the Huffman code [1], and is for example used in the popular compression tool *gzip*. When the distribution of the input is known a priori though it is possible to use a coding scheme tailored for that distribution.
 
-For the case of alphabets following a geometric distribution the optimal prefix code (a prefix code is a code where no code-word is allowed to be the prefix of another code-word) is the Golomb code [2], making it highly suitable for situations in which the occurrence of small values in the input stream is significantly more likely than large values, as for the case of the reconstruction errors.
-
-Golomb coding [3] was invented by Solomon W. Golomb in the 1960s. It takes the input \\(s\\) and divides it by the tunable parameter \\(m\\). First the quotient is encoded in *unary coding* and then the remainder is econded in *truncated binary coding*. Rice coding is a special case of Golomb coding where \(m = 2^k\), which is faster to encode and decode thanks to the usage of powers of 2. It is very intuitive to understand how the coding scheme works just by looking at the example in the following table
+For example for the case of reconstruction errors the occurrence of small values in the input stream is significantly more likely than large values, which makes having smaller code words that cannot be confused to be the prefix of longer code words very convenient to encode them. A code in which no code-word is allowed to be the prefix of another code-word is called a prefix code and for the case of alphabets following a geometric distribution it can be shown that the optimal prefix code is the Golomb code [2]. 
 
 
-# Entropy coding and Rice codes
-Suppose one was to observe a realisation of the above mentioned stochastic process, for example an audio signal, and used LPC or some other model to approximate it. In order to reconstruct the original signal without any approximation error it is necessary to know what the exact realisation of the these error were and add them back into the reconstruction. The problem of efficiently storing these residuals is an instance of *entropy coding*.
-
-
-Let's start by defining what a code is. Assume that the observed data can be modelled as a discrete random variable (note that we redefine \\(X\\) from the previous section):
-\\[ X : \Omega \rightarrow \boldsymbol{\chi} \\]
-where \\(P(x \in X) = P(x)\\)
-
-
-given an alphabet of symbols \\(\Sigma\\), in the digital case \\(\Sigma = \{0, 1\}\\), a code is defined as
-\[\C : \boldsymbol{\chi} \rightarrow \Sigma^*\\]
-\\(C(x)\\) is the code associated with \\(x\\). Let its length be \\(l(C(x))\\), then the expected length of a code is:
-\\[l(C) = E_{x \sim P(x)}[l(C(x))] = \sum_{x \in \chi} P(x)l(C(x))\\]
-
-when designing or choosing a code the objective is to minimise \\(l(C)\\) for the distribution of input words \\(p(x)\\), so that the encoded input will require on average the least number of symbols. This is the problem referred to as *entropy coding*
-
-A good general code that works for any input distribution is the Huffman code [1], and is for example used in the popular compression tool *gzip*. When the distribution of the input is known a priori though it is possible to use a coding scheme tailored for that distribution.
-
-For example for the case of reconstruction errors the occurrence of small values in the input stream is significantly more likely than large values, which makes having smaller code words that cannot be confused to be the prefix of longer code words desirable to encode them. A code in which no code-word is allowed to be the prefix of another code-word is called a prefix code and for the case of alphabets following a geometric distribution it can be shown that the optimal prefix code is the Golomb code [3]. 
-
-
-Golomb coding [2] was invented by Solomon W. Golomb in the 1960s. It takes the input \\(s\\) and divides it by the tunable parameter \\(m\\). First the quotient is encoded in *unary coding* and then the remainder is econded in *truncated binary coding*. Rice coding is a special case of Golomb coding where \\(m = 2^k\\), which is faster to encode and decode thanks to the usage of powers of 2. It is very intuitive to understand how the coding scheme works just by looking at the follwowing table example
-
+Golomb coding [3] was invented by Solomon W. Golomb in the 1960s. It takes the input \\(s\\) and divides it by the tunable parameter \\(m\\). First the quotient is encoded in *unary coding* and then the remainder is econded in *truncated binary coding*. Rice coding is a special case of Golomb coding where \\(m = 2^k\\), which is faster to encode and decode thanks to the usage of powers of 2. It is very intuitive to understand how the coding scheme works just by looking at the follwowing table example
 
 <br>
 
@@ -237,10 +212,10 @@ Following the metadata blocks there is the sequence of frames containing the com
 ## Compressing the audio signal in each data block
 The raw encoding of an audio signal is extremely space inefficient: your common 16 bit 44.1kHz raw audio signal is encoded by storing each second of audio signal as a sequence of 44100 16 bit numbers (that is 88 KB/s!) representing the quantised discrete values of the audio wave over time. Any structure in the audio signal is 	just encoded as it comes: any moment of silence takes as much space as the most explosive of the cymbals!
 
-At a high level, the compression procedure reduces the redundancy in the raw representation by identifying and modelling structured patterns in the raw signal: it exploits this patterns to approximate the raw signal using a mathematical function, and then stores the approximation errors so that it can revert them and recreate the original signal with no loss of information. Compression is achieved because storing both parts is much more efficient than storing the original raw signal: the approximated signal is saved by storing the parameters of its mathematical model and the approximation errors are also saved more efficiently because their distribution can be assumed a priori, and based on that we use a coding scheme optimised for it - Rice coding.
+At a high level, the compression procedure reduces the redundancy in the raw representation by identifying and modelling structured patterns in the raw signal: it exploits this patterns to approximate the raw signal using a mathematical function, and then stores the approximation errors so that it can revert them and recreate the original signal with no loss of information. Compression is achieved because storing both parts is much more efficient than storing the original raw signal: the approximated signal is saved by storing the parameters of its mathematical model and the approximation errors are also saved more efficiently because their distribution can be assumed a priori, and based on that an appropriate coding scheme is chosen.
 
-More specifically, the model being fitted to the signal by FLAC can either be a constant value (for silent moments), LPC or a fixed polynomial predictor from a subset of 4 that usually work well. Fixed polynomial prediction is much faster, but less accurate than LPC. The higher the maximum LPC order \\(p\\), the slower but more accurate the model will be. However, there are diminishing returns with increasing orders: \\(p = 1\\) already leads to good compression, while higher orders increase the required computation time with smaller compression benefits, and in addition to this the LPC parameters take more space to save. The approximation error is then obtained by subtracting the original signal with the approximated signal. Empirically they are Laplace distributed, and can be assumed to be uncorrelated, so they can efficiently be encoded independently using Rice coding scheme (taking into account the presence of the sign bit).  
-These procedure is applied to both channel, left and right independently. A neat trick that can be used to often increase the compression of the block is to switch from left-right to mid-side (mid = (left + right) / 2, side = left - right). 
+More specifically the model being fitted to the signal by FLAC can either be a constant value (for silent moments), LPC or a fixed polynomial predictor from a subset of 4 that usually work well. Fixed polynomial prediction is much faster do decode and takes less space to store, as it has no parameters, but is less accurate than LPC. The higher the maximum LPC order \\(p\\), the slower but more accurate the model will be, but there are diminishing returns with increasing orders: \\(p = 1\\) already leads to good compression, while higher orders increase the required computation time with smaller compression benefits. The approximation error is then obtained by subtracting the original signal with the approximated signal. Empirically they are Laplace distributed, and can be assumed to be uncorrelated, so they can efficiently be encoded independently using Rice coding scheme (taking into account the presence of the sign bit).  
+These procedure is applied to both channel, left and right independently but a neat trick that can be used to often increase the compression of the block is to switch from left-right to mid-side (mid = (left + right) / 2, side = left - right). 
 
 After the modelling choice, the block is then encoded. First a sub frame is built, marking the model used in the header and encoding the audio content in the sub frame body. For example, in the case of LPC the sub frame body contains the \\(p\\) initial samples, the LPC coefficient and then the sequence of the encoded residuals. Finally the frame is constructed by preceding the sub frame with a frame header ant trailing it with a frame footer. The header starts with a sync code, and contains the minimum information necessary for a decoder to play the stream, like sample rate, bits per sample, etc. It also contains the block or sample number and an 8-bit CRC of the frame header. The frame footer contains a 16-bit CRC of the entire encoded frame for error detection. If the reference decoder detects a CRC error it will generate a silent block.
 
